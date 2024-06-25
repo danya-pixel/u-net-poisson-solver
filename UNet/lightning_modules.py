@@ -51,14 +51,14 @@ class BaseUNetModule(pl.LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx):
-        x, y = batch
+        x, y, _ = batch
         pred = self.model(x)
         loss = self.loss_module(pred, y)
 
         self.log("val_loss", loss)
 
     def test_step(self, batch, batch_idx):
-        x, y = batch
+        x, y, _ = batch
         pred = self.model(x)
         loss = self.loss_module(pred, y)
         relative_loss = norm(pred - y) / norm(y)

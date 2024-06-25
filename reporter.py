@@ -1,9 +1,12 @@
 from collections import defaultdict
 from pathlib import Path
 
+import pytorch_lightning as pl
+import torch
 import wandb
+from pytorch_lightning.callbacks import TQDMProgressBar
 
-from train import run_test
+from dataset import PoissonDataModule
 from utils import get_models_configs, get_relative_error_stats
 from vizualize import *
 
@@ -11,15 +14,15 @@ from vizualize import *
 class Reporter:
     def __init__(self, config) -> None:
         self.config = config
-        self.config['DATA_DIR'] = f"data_s{config['SHAPE']}_n{config['N_SAMPLES']}"
+        self.config["DATA_DIR"] = f"data_s{config['SHAPE']}_n{config['N_SAMPLES']}"
 
-        self.models = get_models_configs()[config['SHAPE']]
+        self.models = get_models_configs()[config["SHAPE"]]
         self.run = wandb.init()
         print(torch.cuda.is_available())
 
         self.all_modules_errors = {}
         self.all_modules_cuts = {}
-        
+
     def dump_all_models_stats(self):
         # errors boxplot
         boxplot = get_boxplot(self.all_modules_errors)
@@ -54,13 +57,17 @@ class Reporter:
             run=self.run,
             # run=None,
         )
-        pred_flat, true_flat, errors = get_relative_error_stats(results=results, save_preds=self.config['SAVE_PREDS'])
+        pred_flat, true_flat, errors = get_relative_error_stats(
+            results=results, save_preds=self.config["SAVE_PREDS"]
+        )
         # make graphs from one model
         self.write_single_model_graphs(module, bilinear_type, pred_flat, true_flat)
         # make and save cuts
         self.save_model_cuts(module, bilinear_type, pred_flat, true_flat)
         # save errors stats
         self.save_module_errors(module, bilinear_type, errors)
+
+        print(f"Mean relative error: {np.mean(errors)}")
 
     def save_model_cuts(self, module, bilinear_type, pred_flat, true_flat):
         for idx in self.config["PLOT_INDEXES"]:
@@ -120,3 +127,41 @@ class Reporter:
 
     def save_module_errors(self, module, bilinear_type, errors):
         self.all_modules_errors[module + f"_{bilinear_type}"] = errors
+
+
+def run_test(config, model_config, run):
+    pl.seed_everything(config["SEED"])
+
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    print(f"device: {device}")
+
+    dm = PoissonDataModule(
+        data_dir=config["DATA_DIR"], batch_size=config["BATCH_SIZE"], num_workers=16
+    )
+
+    dm.setup()
+
+    if "pth" in model_config.keys():
+        model = model_config["module"].load_from_checkpoint(model_config["pth"])
+    else:
+        artifact = run.use_artifact(model_config["checkpoint"], type="model")
+        artifact_dir = artifact.download()
+
+        model = model_config["module"].load_from_checkpoint(
+            artifact_dir + "/model.ckpt"
+        )
+
+    trainer = pl.Trainer(
+        num_sanity_val_steps=2,
+        devices=1,
+        callbacks=[
+            TQDMProgressBar(refresh_rate=1),
+        ],
+        precision=64,
+        accelerator="gpu",
+    )
+    print("predicting")
+    print(f"num of samples: {len(dm.test_dataloader())}")
+    results = trainer.predict(model, dm.test_dataloader(), return_predictions=True)
+    print("finished calcs")
+    return results

@@ -79,12 +79,11 @@ class PoissonDataModule(LightningDataModule):
         train_files, val_files = train_test_split(
             train_files, test_size=0.1, random_state=42
         )
-        test_files = data_paths
 
         self.train_dataset = PoissonDataset(train_files, self.transform)
         self.val_dataset = PoissonDataset(val_files, self.transform)
 
-        self.test_dataset = PoissonDataset(test_files, self.transform)  # TODO
+        self.test_dataset = PoissonDataset(test_files, self.transform) 
 
     def train_dataloader(self):
         return DataLoader(

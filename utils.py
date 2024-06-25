@@ -14,11 +14,11 @@ def get_models_configs():
             "bilinear": {
                 "UNet": {
                     "module": UNetModule,
-                    "checkpoint": "", # here you can paste wandb checkpoint
+                    "pth": "pretrained_models/UNet_Interpolation/PoissonU-Net/1nc88xlc/checkpoints/epoch=19-step=1280.ckpt",  # here you can paste wandb checkpoint
                 },
                 "UNetAvg": {
                     "module": UNetAvgModule,
-                    "checkpoint": "",
+                    "pth": "pretrained_models/UNetAvg_Interpolation/PoissonU-Net/ia3kudpz/checkpoints/epoch=19-step=1280.ckpt",
                 },
                 "UNetLeakyAvg": {
                     "module": UNetLeakyAvgModule,
@@ -49,7 +49,7 @@ def get_models_configs():
                 "UNetAvg": {
                     "module": UNetAvg512Module,
                     "checkpoint": "",
-                    "pth": "./artifacts/model-3j5sywlp:v6/model.ckpt", # path to model ckpt
+                    "pth": "./artifacts/model-3j5sywlp:v6/model.ckpt",  # path to model ckpt
                 },
                 "NestedUNetAvg": {
                     "module": NestedUNet512ModuleAvg,
@@ -144,9 +144,9 @@ def get_relative_error_stats(results, save_preds=False):
         y = batch[1]
         x = batch[2]
         bound = batch[3]
-
-        folder = Path(f"report/{pred.shape[2]}_preds")
-        folder.mkdir(parents=True, exist_ok=True)
+        if save_preds: 
+            folder = Path(f"report/{pred.shape[2]}_preds")
+            folder.mkdir(parents=True, exist_ok=True)
 
         for i, (sample_pred, sample_y, sample_x, sample_bound) in enumerate(
             zip(pred, y, x, bound)

@@ -79,7 +79,6 @@ def get_plot3D(surface, title):
 
     fig.update_traces(
         selector=dict(type="surface"),
-      
     )
 
     fig.update_traces(showscale=False)
@@ -183,7 +182,6 @@ def get_error_heatmap(pred, true, percent=True):
         ),
     )
 
-  
     fig.update_xaxes(
         showline=True,
         linewidth=4,
@@ -221,7 +219,7 @@ def get_full_plot2D(sliced, shape):
     x = np.linspace(0, 1, shape)
 
     modes = ["solid", "dashdot", "longdash"] * 4
-  
+
     traces = [(*sliced[i], modes[i]) for i in range(len(sliced))]
 
     fig = go.Figure()
