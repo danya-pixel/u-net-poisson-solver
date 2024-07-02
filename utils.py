@@ -15,7 +15,7 @@ def get_models_configs():
                 "UNet": {
                     "module": UNetModule,
                     "checkpoint": "",  # here you can paste wandb checkpoint
-                    "pth": "" # or .pth model weights 
+                    "pth": "",  # or .pth model weights
                 },
             },
         },
@@ -75,7 +75,7 @@ def get_relative_error_stats(results, save_preds=False):
         y = batch[1]
         x = batch[2]
         bound = batch[3]
-        if save_preds: 
+        if save_preds:
             folder = Path(f"report/{pred.shape[2]}_preds")
             folder.mkdir(parents=True, exist_ok=True)
 

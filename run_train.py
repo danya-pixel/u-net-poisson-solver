@@ -4,15 +4,12 @@ from pathlib import Path
 import pytorch_lightning as pl
 import torch
 import wandb
-from pytorch_lightning.callbacks import (
-    LearningRateMonitor,
-    ModelCheckpoint,
-    TQDMProgressBar,
-)
+from pytorch_lightning.callbacks import (LearningRateMonitor, ModelCheckpoint,
+                                         TQDMProgressBar)
 from pytorch_lightning.loggers import WandbLogger
 
 from dataset import PoissonDataModule
-from UNet.lightning_modules import UNetModule, UNetAvgModule
+from UNet.lightning_modules import UNetModule
 
 
 def train_model(
@@ -100,7 +97,7 @@ if __name__ == "__main__":
 
     data_dir = Path(f"data_s{SHAPE}_n{N_SAMPLES}")
 
-    lightning_modules = [UNetModule, UNetAvgModule]  # you can add modules
+    lightning_modules = [UNetModule]  # you can add modules
     bilinear_type = [True]  # hyperparameters: bilinear or transpose conv
 
     for module in lightning_modules:
@@ -114,10 +111,10 @@ if __name__ == "__main__":
                     "N_SAMPLES": N_SAMPLES,
                     "filters": [4, 8, 16, 32, 64],
                     "bilinear": bilinear,
+                    "is_leaky": False,
+                    "is_avg": True,
                     "in_channels": 1,
                     "out_channels": 1,
-                    "leaky": False,
-                    "avg": True,
                 },
                 data_dir=data_dir,
                 optimizer_name="Adam",

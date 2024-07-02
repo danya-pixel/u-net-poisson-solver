@@ -83,7 +83,7 @@ class PoissonDataModule(LightningDataModule):
         self.train_dataset = PoissonDataset(train_files, self.transform)
         self.val_dataset = PoissonDataset(val_files, self.transform)
 
-        self.test_dataset = PoissonDataset(test_files, self.transform) 
+        self.test_dataset = PoissonDataset(test_files, self.transform)
 
     def train_dataloader(self):
         return DataLoader(

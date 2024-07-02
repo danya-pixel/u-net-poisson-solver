@@ -4,7 +4,6 @@ import pytorch_lightning as pl
 import torch.optim as optim
 from torch import nn, norm
 
-
 from .models import *
 
 
@@ -93,7 +92,9 @@ class UNetModule(BaseUNetModule):
         self.model = UNet(
             in_channels=1,
             out_channels=1,
-            is_bilinear=model_hparams.get("bilinear"),
+            is_bilinear=model_hparams.get("is_bilinear"),
+            is_avg=model_hparams.get("is_avg"),
+            is_leaky=model_hparams.get("is_leaky"),
         )
 
 
@@ -110,7 +111,13 @@ class UNet512Module(BaseUNetModule):
         """
         super().__init__(model_hparams, optimizer_name, optimizer_hparams)
 
-        self.model = UNet512(in_channels=1, out_channels=1, is_bilinear=True)
+        self.model = UNet512(
+            in_channels=1,
+            out_channels=1,
+            is_bilinear=model_hparams.get("is_bilinear"),
+            is_avg=model_hparams.get("is_avg"),
+            is_leaky=model_hparams.get("is_leaky"),
+        )
 
 
 class UNet512mModule(BaseUNetModule):
@@ -126,7 +133,13 @@ class UNet512mModule(BaseUNetModule):
         """
         super().__init__(model_hparams, optimizer_name, optimizer_hparams)
 
-        self.model = UNet512m(in_channels=1, out_channels=1, is_bilinear=True)
+        self.model = UNet512m(
+            in_channels=1,
+            out_channels=1,
+            is_bilinear=model_hparams.get("is_bilinear"),
+            is_avg=model_hparams.get("is_avg"),
+            is_leaky=model_hparams.get("is_leaky"),
+        )
 
 
 class UNetAvg1024Module300k(BaseUNetModule):
@@ -142,7 +155,13 @@ class UNetAvg1024Module300k(BaseUNetModule):
         """
         super().__init__(model_hparams, optimizer_name, optimizer_hparams)
 
-        self.model = UNet1024Avg300k(in_channels=1, out_channels=1, bilinear=True)
+        self.model = UNet1024Avg300k(
+            in_channels=1,
+            out_channels=1,
+            is_bilinear=model_hparams.get("is_bilinear"),
+            is_avg=model_hparams.get("is_avg"),
+            is_leaky=model_hparams.get("is_leaky"),
+        )
 
 
 class UNetAvg2048Module300k(BaseUNetModule):
@@ -157,7 +176,13 @@ class UNetAvg2048Module300k(BaseUNetModule):
             optimizer_hparams (Dict): lr: float, weight_decay: float
         """
         super().__init__(model_hparams, optimizer_name, optimizer_hparams)
-        self.model = UNet2048Avg300k(in_channels=1, out_channels=1, bilinear=True)
+        self.model = UNet2048Avg300k(
+            in_channels=1,
+            out_channels=1,
+            is_bilinear=model_hparams.get("is_bilinear"),
+            is_avg=model_hparams.get("is_avg"),
+            is_leaky=model_hparams.get("is_leaky"),
+        )
 
 
 class UNetAvg2048Module850k(BaseUNetModule):
@@ -173,4 +198,10 @@ class UNetAvg2048Module850k(BaseUNetModule):
         """
         super().__init__(model_hparams, optimizer_name, optimizer_hparams)
 
-        self.model = UNet2048Avg850k(in_channels=1, out_channels=1, bilinear=True)
+        self.model = UNet2048Avg850k(
+            in_channels=1,
+            out_channels=1,
+            is_bilinear=model_hparams.get("is_bilinear"),
+            is_avg=model_hparams.get("is_avg"),
+            is_leaky=model_hparams.get("is_leaky"),
+        )
