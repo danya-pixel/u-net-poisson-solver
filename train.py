@@ -3,8 +3,11 @@ from pathlib import Path
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.callbacks import (LearningRateMonitor, ModelCheckpoint,
-                                         TQDMProgressBar)
+from pytorch_lightning.callbacks import (
+    LearningRateMonitor,
+    ModelCheckpoint,
+    TQDMProgressBar,
+)
 from pytorch_lightning.loggers import WandbLogger
 
 from dataset import PoissonDataModule

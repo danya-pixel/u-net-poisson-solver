@@ -11,15 +11,15 @@ from vizualize import *
 class Reporter:
     def __init__(self, config) -> None:
         self.config = config
-        self.config['DATA_DIR'] = f"data_s{config['SHAPE']}_n{config['N_SAMPLES']}"
+        self.config["DATA_DIR"] = f"data_s{config['SHAPE']}_n{config['N_SAMPLES']}"
 
-        self.models = get_models_configs()[config['SHAPE']]
+        self.models = get_models_configs()[config["SHAPE"]]
         self.run = wandb.init()
         print(torch.cuda.is_available())
 
         self.all_modules_errors = {}
         self.all_modules_cuts = {}
-        
+
     def dump_all_models_stats(self):
         # errors boxplot
         boxplot = get_boxplot(self.all_modules_errors)
@@ -54,7 +54,9 @@ class Reporter:
             run=self.run,
             # run=None,
         )
-        pred_flat, true_flat, errors = get_relative_error_stats(results=results, save_preds=self.config['SAVE_PREDS'])
+        pred_flat, true_flat, errors = get_relative_error_stats(
+            results=results, save_preds=self.config["SAVE_PREDS"]
+        )
         # make graphs from one model
         self.write_single_model_graphs(module, bilinear_type, pred_flat, true_flat)
         # make and save cuts

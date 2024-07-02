@@ -24,7 +24,6 @@ if __name__ == "__main__":
     data_dir = Path(f"data_s{SHAPE}_n{N_SAMPLES}")
 
     lightning_modules = [UNetModule]  # you can add modules
-    models = [UNetAvg]  # you can add models
     bilinear_type = [True]  # hyperparameters: bilinear or transpose conv
 
     for module in lightning_modules:
@@ -40,6 +39,8 @@ if __name__ == "__main__":
                     "bilinear": bilinear,
                     "in_channels": 1,
                     "out_channels": 1,
+                    "leaky": False,
+                    "avg": True,
                 },
                 data_dir=data_dir,
                 optimizer_name="Adam",

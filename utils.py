@@ -14,79 +14,10 @@ def get_models_configs():
             "bilinear": {
                 "UNet": {
                     "module": UNetModule,
-                    "checkpoint": "", # here you can paste wandb checkpoint
-                },
-                "UNetAvg": {
-                    "module": UNetAvgModule,
-                    "checkpoint": "",
-                },
-                "UNetLeakyAvg": {
-                    "module": UNetLeakyAvgModule,
-                    "checkpoint": "",
-                },
-                "NestedUNet": {
-                    "module": NestedUNetModule,
-                    "checkpoint": "",
-                },
-                "NestedUNetAvg": {
-                    "module": NestedUNetModuleAvg,
-                    "checkpoint": "",
-                },
-                "NestedUNetLeakyAvg": {
-                    "module": NestedUNetModuleLeakyAvg,
-                    "checkpoint": "",
+                    "checkpoint": "",  # here you can paste wandb checkpoint
+                    "pth": "" # or .pth model weights 
                 },
             },
-            "transposed": {
-                "NestedUNet": {
-                    "module": NestedUNetModuleT,
-                    "checkpoint": "",
-                },
-            },
-        },
-        512: {
-            "bilinear": {
-                "UNetAvg": {
-                    "module": UNetAvg512Module,
-                    "checkpoint": "",
-                    "pth": "./artifacts/model-3j5sywlp:v6/model.ckpt", # path to model ckpt
-                },
-                "NestedUNetAvg": {
-                    "module": NestedUNet512ModuleAvg,
-                    "checkpoint": "",
-                    "pth": "./artifacts/model-9bgr4ckt:v8/model.ckpt",
-                },
-            }
-        },
-        1024: {
-            "bilinear": {
-                "UNetAvg": {
-                    "module": UNetAvg1024Module,
-                    "checkpoint": "",
-                    "pth": "/home/danya-sakharov/PoissonNN/artifacts/1024model/epoch=14-step=1905.ckpt",
-                },
-                "NestedUNet": {
-                    "module": NestedUNet512ModuleAvg,
-                    "checkpoint": "",
-                    "pth": "./artifacts/model-9bgr4ckt:v8/model.ckpt",
-                },
-                "UNet300k1024": {
-                    "module": UNetAvg1024Module300k,
-                    "pth": "./artifacts/1024300k/last.ckpt",
-                },
-                "UNet300k1024Reisze": {
-                    "module": UNetAvg1024Module300kResize,
-                    "pth": "./artifacts/1024300k/last.ckpt",
-                },
-            }
-        },
-        2048: {
-            "bilinear": {
-                "UNetAvg": {
-                    "module": UNetAvg2048Module300k,
-                    "pth": "./artifacts/2048300k/epoch=29-step=12150.ckpt",
-                }
-            }
         },
     }
     return models
