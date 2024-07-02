@@ -1,9 +1,12 @@
 from collections import defaultdict
 from pathlib import Path
 
+import pytorch_lightning as pl
+import torch
 import wandb
+from pytorch_lightning.callbacks import TQDMProgressBar
 
-from train import run_test
+from dataset import PoissonDataModule
 from utils import get_models_configs, get_relative_error_stats
 from vizualize import *
 
@@ -64,6 +67,8 @@ class Reporter:
         # save errors stats
         self.save_module_errors(module, bilinear_type, errors)
 
+        print(f"Mean relative error: {np.mean(errors)}")
+
     def save_model_cuts(self, module, bilinear_type, pred_flat, true_flat):
         for idx in self.config["PLOT_INDEXES"]:
             self.init_model_cuts_dict(idx, true_flat[idx])
@@ -122,3 +127,41 @@ class Reporter:
 
     def save_module_errors(self, module, bilinear_type, errors):
         self.all_modules_errors[module + f"_{bilinear_type}"] = errors
+
+
+def run_test(config, model_config, run):
+    pl.seed_everything(config["SEED"])
+
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    print(f"device: {device}")
+
+    dm = PoissonDataModule(
+        data_dir=config["DATA_DIR"], batch_size=config["BATCH_SIZE"], num_workers=16
+    )
+
+    dm.setup()
+
+    if "pth" in model_config.keys():
+        model = model_config["module"].load_from_checkpoint(model_config["pth"])
+    else:
+        artifact = run.use_artifact(model_config["checkpoint"], type="model")
+        artifact_dir = artifact.download()
+
+        model = model_config["module"].load_from_checkpoint(
+            artifact_dir + "/model.ckpt"
+        )
+
+    trainer = pl.Trainer(
+        num_sanity_val_steps=2,
+        devices=1,
+        callbacks=[
+            TQDMProgressBar(refresh_rate=1),
+        ],
+        precision=64,
+        accelerator="gpu",
+    )
+    print("predicting")
+    print(f"num of samples: {len(dm.test_dataloader())}")
+    results = trainer.predict(model, dm.test_dataloader(), return_predictions=True)
+    print("finished calcs")
+    return results

@@ -75,9 +75,9 @@ def get_relative_error_stats(results, save_preds=False):
         y = batch[1]
         x = batch[2]
         bound = batch[3]
-
-        folder = Path(f"report/{pred.shape[2]}_preds")
-        folder.mkdir(parents=True, exist_ok=True)
+        if save_preds: 
+            folder = Path(f"report/{pred.shape[2]}_preds")
+            folder.mkdir(parents=True, exist_ok=True)
 
         for i, (sample_pred, sample_y, sample_x, sample_bound) in enumerate(
             zip(pred, y, x, bound)
