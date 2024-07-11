@@ -43,7 +43,7 @@ class Reporter:
                         (self.all_modules_cuts[example][cut_type][module], module)
                     )
 
-                fig = get_full_plot2D(all_modules_stats, self.config["SHAPE"])
+                fig = get_full_plot2D(all_modules_stats, self.config["SHAPE"], cut_type)
                 fig.write_image(
                     SAVE_DIR / f"_{cut_type}.png",
                     scale=self.config["PLOT_SCALE_FACTOR"],

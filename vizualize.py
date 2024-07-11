@@ -210,9 +210,15 @@ def get_plot2D(pred_sliced, true_sliced, shape):
     return fig
 
 
-def get_full_plot2D(sliced, shape):
-    line_size = 7
-    text_size = 50
+def get_full_plot2D(sliced, shape, cut_type):
+    from plotly.graph_objects import Layout
+
+# Set layout with background color you want (rgba values)
+# This one is for white background
+    layout = Layout(plot_bgcolor='rgba(0,0,0,0)')
+    line_size = 7  # TikZ line width 1pt
+    marker_size = 6  # TikZ marker size 2.5pt converted to Plotly scale
+    text_size = 50  # Adjust text size for clarity in Plotly
     h_size = 1000
     w_size = h_size
 
@@ -222,7 +228,7 @@ def get_full_plot2D(sliced, shape):
 
     traces = [(*sliced[i], modes[i]) for i in range(len(sliced))]
 
-    fig = go.Figure()
+    fig = go.Figure(layout=layout)
 
     for trace, name, mode in traces:
         fig.add_trace(
@@ -235,6 +241,10 @@ def get_full_plot2D(sliced, shape):
                     width=line_size,
                     dash=mode,
                 ),
+                marker=dict(
+                    size=marker_size,
+                    symbol='circle'  # TikZ marker style
+                )
             )
         )
 
@@ -257,8 +267,26 @@ def get_full_plot2D(sliced, shape):
             font=dict(family="Times New Roman", size=3 * text_size / 4, color="black"),
         ),
     )
-
+    # fig.update_layout(
+    #     autosize=False,
+    #     width=600,
+    #     height=400,
+    #     font=dict(family="Times New Roman", size=text_size, color="black"),
+    #     margin=dict(l=40, r=40, b=40, t=40, pad=0),
+    #     legend=dict(
+    #         orientation="v",
+    #         x=0.98,
+    #         y=0.98,
+    #         xanchor="right",
+    #         yanchor="top",
+    #         bordercolor="black",
+    #         borderwidth=1,
+    #         font=dict(family="Times New Roman", size=text_size, color="black"),
+    #     ),
+    # )
+    
     # %% Set xandy-axis
+    axis_text = "<i>x</i>" if cut_type.startswith("x") else "<i>y</i>" 
     fig.update_xaxes(
         showline=True,
         linewidth=4,
@@ -266,11 +294,11 @@ def get_full_plot2D(sliced, shape):
         mirror=True,
         showgrid=True,
         gridwidth=2,
-        gridcolor="LightPink",
+        gridcolor="gray",
         zeroline=True,
         zerolinewidth=2,
-        zerolinecolor="LightPink",
-        title_text=f"<i>x</i>",
+        zerolinecolor="black",
+        title_text=axis_text,
         title_font_size=text_size,
         #  tickvals  = [0. + i*0.02 for i in range(5)],
         # ticktext  = [str(10*i) for i in range(6)]+['<i>t<i>'],
@@ -283,16 +311,18 @@ def get_full_plot2D(sliced, shape):
         mirror=True,
         showgrid=True,
         gridwidth=2,
-        gridcolor="LightPink",
+        gridcolor="gray",
         zeroline=True,
         zerolinewidth=2,
-        zerolinecolor="LightPink",
+        zerolinecolor="gray",
         title_text=f"<i>z</i>",
         title_font_size=text_size,
         title_standoff=50,
         # nticks=5,
         # range=[0,z_max[k]],
     )
+    
+    
     return fig
 
 

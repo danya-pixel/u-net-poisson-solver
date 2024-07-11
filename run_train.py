@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     data_dir = Path(f"data_s{SHAPE}_n{N_SAMPLES}")
 
-    lightning_modules = [UNetModule, UNetAvgModule]  # you can add modules
+    lightning_modules = [UNetModule]  # you can add modules
     bilinear_type = [True]  # hyperparameters: bilinear or transpose conv
 
     for module in lightning_modules:
@@ -108,7 +108,7 @@ if __name__ == "__main__":
             unet_model, test_preds = train_model(
                 base_module=module,
                 model_hparams={
-                    "epochs": 20,
+                    "epochs": 50,
                     "batch_size": BATCH_SIZE,
                     "SHAPE": SHAPE,
                     "N_SAMPLES": N_SAMPLES,

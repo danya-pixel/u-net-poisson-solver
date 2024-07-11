@@ -12,6 +12,36 @@ from vizualize import get_plot2D, get_plot3D
 from .models import *
 
 
+class PhysicsInformedLoss(pl.LightningModule):
+    def __init__(self, N, gamma, omega) -> None:
+        super().__init__()
+        
+        self.N = N
+        self.gamma = gamma
+        self.omega = omega
+        self.last_data_loss = None
+        self.last_physics_loss = None
+        self.laplace_kernel = torch.Tensor([[0, 1, 0],
+                                    [1, -4, 1],
+                                    [0, 1, 0]]).unsqueeze(0).unsqueeze(0)
+        
+    
+    def laplacian(self, u):
+        laplace_u = F.conv2d(u, self.laplace_kernel.to(u), padding=0)
+        return laplace_u
+
+    def residual(self, pred, x):
+        return self.laplacian(pred[:, :, 1:-1, 1:-1]) - (1/self.N)**2 * x[:, :, 2:-2, 2:-2]
+
+    def __call__(self, pred: torch.Tensor, true: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
+        data_loss = F.mse_loss(pred, true)
+        residual = self.residual(pred, x)
+        physics_loss = F.mse_loss(residual, torch.zeros_like(residual))
+        self.last_data_loss = data_loss
+        self.last_physics_loss = physics_loss
+        return self.gamma * data_loss + (1-self.gamma) * self.omega * physics_loss
+
+
 class BaseUNetModule(pl.LightningModule):
     def __init__(
         self, model_hparams: Dict, optimizer_name: str, optimizer_hparams: Dict
@@ -29,7 +59,8 @@ class BaseUNetModule(pl.LightningModule):
         self.optimizer_hparams = optimizer_hparams
         self.save_hyperparameters()
 
-        self.loss_module = nn.MSELoss()
+        # self.loss_module = nn.MSELoss()
+        self.loss_module = PhysicsInformedLoss(128, model_hparams['gamma'], model_hparams['omega'])
         self.model = None
 
     def forward(self, x):
@@ -45,22 +76,28 @@ class BaseUNetModule(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y, _ = batch
         pred = self.model(x)
-        loss = self.loss_module(pred, y)
+        loss = self.loss_module(pred, y, x)
 
         self.log("train_loss", loss)
+        self.log("train_data_loss", self.loss_module.last_data_loss)
+        self.log("train_physics_loss", self.loss_module.last_physics_loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
         x, y, _ = batch
         pred = self.model(x)
-        loss = self.loss_module(pred, y)
+        loss = self.loss_module(pred, y, x)
+        relative_loss = norm(pred - y) / norm(y)
 
         self.log("val_loss", loss)
+        self.log("relative_loss", relative_loss)
+        self.log("val_data_loss", self.loss_module.last_data_loss)
+        self.log("val_physics_loss", self.loss_module.last_physics_loss) 
 
     def test_step(self, batch, batch_idx):
         x, y, _ = batch
         pred = self.model(x)
-        loss = self.loss_module(pred, y)
+        loss = self.loss_module(pred, y, x)
         relative_loss = norm(pred - y) / norm(y)
 
         self.log("test_loss", loss)
