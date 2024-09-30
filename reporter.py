@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytorch_lightning as pl
 import torch
-import wandb
 from pytorch_lightning.callbacks import TQDMProgressBar
 
+import wandb
 from dataset import PoissonDataModule
 from utils import get_models_configs, get_relative_error_stats
 from vizualize import *

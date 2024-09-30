@@ -1,6 +1,6 @@
 # U-Net Poisson Solver
 
-This is the GitHub repository for the paper ... . The project implements a U-Net and hybrid approach for solving Poisson equation using deep learning.
+This is the GitHub repository for the paper `A Hybrid Method for Solving the Two-Dimensional Poisson Equation: Combining U-Net and Conjugate Gradient Method`. The project implements a U-Net and hybrid approach for solving Poisson equation using deep learning.
 
 
 ## Table of Contents

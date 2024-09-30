@@ -3,11 +3,11 @@ from pathlib import Path
 
 import pytorch_lightning as pl
 import torch
-import wandb
 from pytorch_lightning.callbacks import (LearningRateMonitor, ModelCheckpoint,
                                          TQDMProgressBar)
 from pytorch_lightning.loggers import WandbLogger
 
+import wandb
 from dataset import PoissonDataModule
 from UNet.lightning_modules import UNetModule
 
@@ -27,7 +27,7 @@ def train_model(
     model = base_module(model_hparams=model_hparams, **kwargs)
     # ---initialize Wandb logger for pytorch lightning---
 
-    if model_hparams.get("bilinear") == True:
+    if model_hparams.get("is_bilinear") == True:
         model_name = model.model.__class__.__name__ + "_Interpolation"
     else:
         model_name = model.model.__class__.__name__ + "_Transposed"
@@ -105,12 +105,11 @@ if __name__ == "__main__":
             unet_model, test_preds = train_model(
                 base_module=module,
                 model_hparams={
-                    "epochs": 20,
+                    "epochs": 50,
                     "batch_size": BATCH_SIZE,
                     "SHAPE": SHAPE,
                     "N_SAMPLES": N_SAMPLES,
-                    "filters": [4, 8, 16, 32, 64],
-                    "bilinear": bilinear,
+                    "is_bilinear": bilinear,
                     "is_leaky": False,
                     "is_avg": True,
                     "in_channels": 1,
@@ -119,6 +118,6 @@ if __name__ == "__main__":
                 data_dir=data_dir,
                 optimizer_name="Adam",
                 optimizer_hparams={"lr": 1e-3, "weight_decay": 1e-4},
-                project="PoissonU-Net",
+                project="PoissonNN128",
             )
             wandb.finish()

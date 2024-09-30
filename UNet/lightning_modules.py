@@ -69,7 +69,6 @@ class BaseUNetModule(pl.LightningModule):
         else:
             assert False, f'Unknown optimizer: "{self.optimizer_name}"'
 
-        # We will reduce the learning rate by 0.1 after 100 and 150 epochs
         scheduler = optim.lr_scheduler.MultiStepLR(
             optimizer, milestones=[10, 20, 30], gamma=0.5
         )
